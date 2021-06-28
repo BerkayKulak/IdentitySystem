@@ -1,6 +1,10 @@
+using IdentitySystem.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -14,9 +18,31 @@ namespace IdentitySystem
     {
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+
+
+        public IConfiguration configuration { get; }
+
+        public Startup(IConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            // istemiþ olduðu sýnýfýn bir nesne örneðini oluþturur.
+            services.AddDbContext<AppIdentityDbContext>(opts =>
+            {
+                opts.UseSqlServer(configuration["ConnectionStrings:DefaultConnectionString"]);
+
+            });
+
+            //IdentityUseri' App user olarak miras aldýk.
+            // IdentityRole ile miras alma iþlemi gerçekleþtirmediðimizden kullanýyoruz.
+            services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<AppIdentityDbContext>();
+
+
+
+            services.AddMvc(options => options.EnableEndpointRouting = false);
             
         }
 
@@ -28,7 +54,7 @@ namespace IdentitySystem
             app.UseDeveloperExceptionPage();// sayfamýzda bir hata aldýðýmýzda açýklayýcý bilgiler sunar
             app.UseStatusCodePages();// hatanýn nerde olduðunu gösteren bir yazý gösteriyor.
             app.UseStaticFiles();
-            //app.UseMvcWithDefaultRoute();// arka planda //Controller/Action/{id}
+            app.UseMvcWithDefaultRoute();// arka planda //Controller/Action/{id}
 
             app.UseAuthentication();
 
