@@ -38,7 +38,18 @@ namespace IdentitySystem
 
             //IdentityUseri' App user olarak miras aldýk.
             // IdentityRole ile miras alma iþlemi gerçekleþtirmediðimizden kullanýyoruz.
-            services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<AppIdentityDbContext>();
+
+            // ok iþareti çýkarttýðým zaman
+            // bana gidip o ctordan istemiþ olduðu classtan bir tane class oluþturuyor.
+            services.AddIdentity<AppUser, AppRole>(opts => {
+
+                opts.Password.RequiredLength = 4; // default olarak en az 4 karakter isticez.
+                opts.Password.RequireNonAlphanumeric = false; // yýldýz ya da nokta gibi karakter istemiyor
+                opts.Password.RequireLowercase = false; // küçük harf istemiyorum
+                opts.Password.RequireUppercase = false; // büyük harf istemiyorum.
+                opts.Password.RequireDigit = false;// sayýsal karakter de istemiyorum 
+            
+            }).AddEntityFrameworkStores<AppIdentityDbContext>();
 
 
 
