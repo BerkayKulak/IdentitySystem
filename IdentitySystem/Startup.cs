@@ -1,3 +1,4 @@
+using IdentitySystem.CustomValidation;
 using IdentitySystem.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -49,7 +50,7 @@ namespace IdentitySystem
                 opts.Password.RequireUppercase = false; // büyük harf istemiyorum.
                 opts.Password.RequireDigit = false;// sayýsal karakter de istemiyorum 
             
-            }).AddEntityFrameworkStores<AppIdentityDbContext>();
+            }).AddPasswordValidator<CustomPasswordValidator>().AddEntityFrameworkStores<AppIdentityDbContext>();
 
 
 
