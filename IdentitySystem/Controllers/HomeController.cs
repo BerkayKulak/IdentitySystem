@@ -41,6 +41,13 @@ namespace IdentitySystem.Controllers
 
                 if(user!=null)
                 {
+
+                    if(await userManager.IsLockedOutAsync(user))
+                    {
+                        ModelState.AddModelError("", "Hesabınız bir süreliğine kilitlenmiştir. Lütfen daha sonra tekrar deneyiniz.");
+
+                    }
+
                    await signInManager.SignOutAsync();
 
                     //userlogin.RememberMe = cookienin gerçekten geçerli olup olmadığını kontrol edicez. checkboxtan kontrol edicez. işaretlersem true olur.
@@ -49,17 +56,49 @@ namespace IdentitySystem.Controllers
 
                     if(result.Succeeded)
                     {
+                        // başarılı giriş yaptığımız için AccessFailedCount değerini 0 lıcak
+                        await userManager.ResetAccessFailedCountAsync(user);
+
                         if(TempData["ReturnUrl"]!=null)
                         {
                             return Redirect(TempData["ReturnUrl"].ToString());
                         }
                         return RedirectToAction("Index", "Member");
                     }
+                    else 
+                    {
+                        // başarısız girişte 1 artıcak
+                        await userManager.AccessFailedAsync(user);
+
+                       
+
+                        // kaç başarısız giriş yaptı alır.
+                        int fail = await userManager.GetAccessFailedCountAsync(user);
+
+                        ModelState.AddModelError("", $"{fail} kez başarısız giriş.");
+
+                        if (fail == 3)
+                        {
+                            // kullanıcıyı 20 dakka kilitliyoruz
+                            await userManager.SetLockoutEndDateAsync(user, new System.DateTimeOffset(DateTime.Now.AddMinutes(20)));
+
+
+                            ModelState.AddModelError("", "Hesabınız 3 başarısız girişten dolayı 20 dakika süreyle kilitlenmiştir.");
+                        }
+
+                        else
+                        {
+                            ModelState.AddModelError("", "Email adresi veya şifre Yanlış");
+
+                        }
+
+
+                    }
                     
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Geçersiz Email adresi veya şifresi");
+                    ModelState.AddModelError("", "Bu email adresine kayıtlı kullanıcı bulunamamıştır.");
                 }
             }
             return View(userlogin);
