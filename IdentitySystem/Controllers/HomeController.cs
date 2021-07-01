@@ -12,17 +12,48 @@ namespace IdentitySystem.Controllers
     public class HomeController : Controller
     {
         public UserManager<AppUser> userManager { get; }
-        public HomeController(UserManager<AppUser> userManager)
+        public SignInManager<AppUser> signInManager { get; }
+        public HomeController(UserManager<AppUser> userManager,SignInManager<AppUser> signInManager)
         {
             this.userManager = userManager;
+            this.signInManager = signInManager;
         }
         public IActionResult Index()
         {
             return View();
         }
 
+
         public IActionResult LogIn()
         {
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> LogIn(LoginViewModel userlogin)
+        {
+
+            if(ModelState.IsValid)
+            {
+                AppUser user = await userManager.FindByEmailAsync(userlogin.Email);
+
+                if(user!=null)
+                {
+                   await signInManager.SignOutAsync();
+                   Microsoft.AspNetCore.Identity.SignInResult result =  await signInManager.PasswordSignInAsync(user, userlogin.Password, false, false);
+
+                    if(result.Succeeded)
+                    {
+                        return RedirectToAction("Index", "Member");
+                    }
+                    
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Geçersiz Email adresi veya şifresi");
+                }
+            }
             return View();
         }
 
