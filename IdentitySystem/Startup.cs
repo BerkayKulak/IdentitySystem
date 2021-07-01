@@ -101,22 +101,10 @@ namespace IdentitySystem
             app.UseDeveloperExceptionPage();// sayfamýzda bir hata aldýðýmýzda açýklayýcý bilgiler sunar
             app.UseStatusCodePages();// hatanýn nerde olduðunu gösteren bir yazý gösteriyor.
             app.UseStaticFiles();
+            app.UseAuthentication();
             app.UseMvcWithDefaultRoute();// arka planda //Controller/Action/{id}
 
-            app.UseAuthentication();
-
-
-
-
-
-
-
-
-
-
-
-
-
+           
 
 
 

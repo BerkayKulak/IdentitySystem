@@ -24,8 +24,9 @@ namespace IdentitySystem.Controllers
         }
 
 
-        public IActionResult LogIn()
+        public IActionResult LogIn(string ReturnUrl)
         {
+            TempData["ReturnUrl"] = ReturnUrl;
             return View();
         }
 
@@ -41,10 +42,17 @@ namespace IdentitySystem.Controllers
                 if(user!=null)
                 {
                    await signInManager.SignOutAsync();
-                   Microsoft.AspNetCore.Identity.SignInResult result =  await signInManager.PasswordSignInAsync(user, userlogin.Password, false, false);
+
+                    //userlogin.RememberMe = cookienin gerçekten geçerli olup olmadığını kontrol edicez. checkboxtan kontrol edicez. işaretlersem true olur.
+                    // benim startuptaki 60 gün geçerli olacak
+                    Microsoft.AspNetCore.Identity.SignInResult result =  await signInManager.PasswordSignInAsync(user, userlogin.Password, userlogin.RememberMe, false);
 
                     if(result.Succeeded)
                     {
+                        if(TempData["ReturnUrl"]!=null)
+                        {
+                            return Redirect(TempData["ReturnUrl"].ToString());
+                        }
                         return RedirectToAction("Index", "Member");
                     }
                     
@@ -54,7 +62,7 @@ namespace IdentitySystem.Controllers
                     ModelState.AddModelError("", "Geçersiz Email adresi veya şifresi");
                 }
             }
-            return View();
+            return View(userlogin);
         }
 
 
