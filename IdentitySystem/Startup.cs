@@ -44,13 +44,17 @@ namespace IdentitySystem
             // bana gidip o ctordan istemiþ olduðu classtan bir tane class oluþturuyor.
             services.AddIdentity<AppUser, AppRole>(opts => {
 
+                opts.User.RequireUniqueEmail = true;
+                opts.User.AllowedUserNameCharacters
+                = "abcçdefghýijklmnoöpqrsþtuüvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._";
+
                 opts.Password.RequiredLength = 4; // default olarak en az 4 karakter isticez.
                 opts.Password.RequireNonAlphanumeric = false; // yýldýz ya da nokta gibi karakter istemiyor
                 opts.Password.RequireLowercase = false; // küçük harf istemiyorum
                 opts.Password.RequireUppercase = false; // büyük harf istemiyorum.
                 opts.Password.RequireDigit = false;// sayýsal karakter de istemiyorum 
             
-            }).AddPasswordValidator<CustomPasswordValidator>().AddEntityFrameworkStores<AppIdentityDbContext>();
+            }).AddPasswordValidator<CustomPasswordValidator>().AddUserValidator<CustomUserValidator>().AddEntityFrameworkStores<AppIdentityDbContext>();
 
 
 
