@@ -46,5 +46,67 @@ namespace IdentitySystem.Controllers
         {
             return View();
         }
+
+
+        [HttpPost]
+        public IActionResult PasswordChange(PasswordChangeViewModel passwordChangeViewModel)
+        {
+
+            if (ModelState.IsValid)
+            {
+                // burdaki name değeri Cookie bilgisinden okuyor.
+                AppUser user = userManager.FindByNameAsync(User.Identity.Name).Result;
+
+
+                // eski şifresi doğru mu ilk bunu kontrol edelim.
+                bool exist = userManager.CheckPasswordAsync(user, passwordChangeViewModel.PasswordOld).Result;
+
+                // şifre doğruysa yani şifre varsa
+                if (exist)
+                {
+                    IdentityResult result = userManager.ChangePasswordAsync(user, passwordChangeViewModel.PasswordOld, passwordChangeViewModel.PasswordNew).Result;
+
+                    // kullanıcı şifresi doğruysa direk Index ' e yönlendirebiliriz.
+                    // ya da şifreniz değiştirildi diyebiliriz. biz böyle yapcaz.
+                    if (result.Succeeded)
+                    {
+                        userManager.UpdateSecurityStampAsync(user);
+
+                        // tekrar çıkış yaptı
+                        signInManager.SignOutAsync();
+
+                        // tekrar giriş yaptı. bunu kullanıcı hissetmicek ama cookiesi oluşmul olucak.
+                        
+                        signInManager.PasswordSignInAsync(user, passwordChangeViewModel.PasswordNew, true,false);
+
+                        // eğer SignOutAsync,PasswordSignInAsync  yapmasaydım IdentityApi 30 dakika içinde sistemden atıcak ve login sayfasına yönlendiricek.
+
+                        
+
+                        ViewBag.success = "true";
+
+
+                    }
+                    else
+                    {
+                        foreach (var item in result.Errors)
+                        {
+                            ModelState.AddModelError("", item.Description);
+                        }
+                    }
+
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Eski şifreniz yanlış");
+                }
+
+            }
+
+
+            //  ModelState.AddModelError("", "Eski şifreniz yanlış"); ile hataları ekledik
+            // varsa bunları gösterebilmek için içine passwordChangeViewModel yazıyoruz.
+            return View(passwordChangeViewModel);
+        }
     }
 }
