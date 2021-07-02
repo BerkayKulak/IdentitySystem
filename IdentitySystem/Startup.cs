@@ -80,6 +80,7 @@ namespace IdentitySystem
                 opts.ExpireTimeSpan = TimeSpan.FromDays(60);
                 // kullanýcý üye olmadan, üyelerin eriþebildiði bir sayfaya týklarsa kullanýcýyý login sayfasýna yönlendiririz.
                 opts.LoginPath = new PathString("/Home/Login");
+                opts.LogoutPath = new PathString("/Member/LogOut");
 
                 opts.Cookie = cookieBuilder;
 

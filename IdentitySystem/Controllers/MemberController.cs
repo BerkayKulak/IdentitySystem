@@ -169,5 +169,16 @@ namespace IdentitySystem.Controllers
             // varsa bunları gösterebilmek için içine passwordChangeViewModel yazıyoruz.
             return View(passwordChangeViewModel);
         }
+
+
+        public void LogOut()
+        {
+            signInManager.SignOutAsync();
+      
+        }
+
+
+
+
     }
 }
