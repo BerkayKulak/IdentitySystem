@@ -69,7 +69,7 @@ namespace IdentitySystem.Controllers
 
                 // startuptaki hatalar geçerli. burdaki hataları Update yaparken bir hata ile karşılaşırsa
                 // bunu IdentityResult  resulta atacak
-                // UpdateAsync hem custom validationları hem de startup tarafındaki validationları içeriyior
+                // UpdateAsync hem custom validationları hem de startup tarafındaki validationları içeriyior//
                 IdentityResult result = await userManager.UpdateAsync(user);
 
                 if(result.Succeeded)
