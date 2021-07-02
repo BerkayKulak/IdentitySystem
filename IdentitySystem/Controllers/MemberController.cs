@@ -42,6 +42,67 @@ namespace IdentitySystem.Controllers
             return View(userViewModel);
         }
 
+        public IActionResult UserEdit()
+        {
+            // UserViewModel, AppUser'in kullanıcıya yansıyan tarafıydı
+            AppUser user = userManager.FindByNameAsync(User.Identity.Name).Result;
+
+            UserViewModel userViewModel = user.Adapt<UserViewModel>();
+
+            return View(userViewModel);// kullanıcı bilgileri güncellicek bu yüzden UserViewModel'i dolu olarak gönderiyorum.
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> UserEdit(UserViewModel userViewModel)
+        {
+            ModelState.Remove("Password");
+
+            if(ModelState.IsValid)
+            {
+                AppUser user = await userManager.FindByNameAsync(User.Identity.Name);
+
+                // güncelliyoruz.
+                user.UserName = userViewModel.UserName;
+                user.Email = userViewModel.Email;
+                user.PhoneNumber = userViewModel.PhoneNumber;
+
+                // startuptaki hatalar geçerli. burdaki hataları Update yaparken bir hata ile karşılaşırsa
+                // bunu IdentityResult  resulta atacak
+                // UpdateAsync hem custom validationları hem de startup tarafındaki validationları içeriyior
+                IdentityResult result = await userManager.UpdateAsync(user);
+
+                if(result.Succeeded)
+                {
+                    await userManager.UpdateSecurityStampAsync(user);
+
+                    // tekrar çıkış yaptı
+                    await signInManager.SignOutAsync();
+
+                    // true dememizin amacı cookie 60 gün geçerli olcak demek (60) günü belirtmiştik 
+
+                    await signInManager.SignInAsync(user, true);
+
+                    ViewBag.Success = "true";
+                }
+                else
+                {
+                    foreach (var item in result.Errors)
+                    {
+                        ModelState.AddModelError("", item.Description);
+                    }
+                }
+
+
+            }
+
+            return View(userViewModel);
+
+        }
+
+
+
+
         public IActionResult PasswordChange()
         {
             return View();
