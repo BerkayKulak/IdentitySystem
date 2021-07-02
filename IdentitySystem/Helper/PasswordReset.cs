@@ -25,7 +25,7 @@ namespace IdentitySystem.Helper
             mail.IsBodyHtml = true;
             smtpClient.Port = 587;
             smtpClient.EnableSsl = true;
-            smtpClient.Credentials = new System.Net.NetworkCredential("kulakberkay15@gmail.com", "43795164825Fb");
+            smtpClient.Credentials = new System.Net.NetworkCredential("Your Mail Adress", "Your Password");
             smtpClient.Send(mail);
 
         }
