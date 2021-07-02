@@ -28,13 +28,6 @@ namespace IdentitySystem.Helper
             smtpClient.Credentials = new System.Net.NetworkCredential("kulakberkay15@gmail.com", "43795164825Fb");
             smtpClient.Send(mail);
 
-
-
-
-
-
-
-
         }
     }
 }

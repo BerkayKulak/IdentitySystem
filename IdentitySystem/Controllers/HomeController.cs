@@ -197,7 +197,7 @@ namespace IdentitySystem.Controllers
 
                 Helper.PasswordReset.PasswordResetSendEmail(passwordResetLink);
 
-                ViewBag.status = "successfull";
+                ViewBag.status = "success";
 
             }
             else
@@ -208,6 +208,64 @@ namespace IdentitySystem.Controllers
 
 
             return View();
+        }
+
+
+        public IActionResult ResetPasswordConfirm(string userId,string token)
+        {
+            TempData["userId"] = userId;
+            TempData["token"] = token;
+
+            return View();
+        }
+
+
+        [HttpPost]
+
+        // Bind = PasswordResetViewModel classına hangi değerlerin geleceğini belirtiyoruz. Emaili belirtmedik mesela
+        public async Task<IActionResult> ResetPasswordConfirm([Bind("PasswordNew")]PasswordResetViewModel passwordResetViewModel)
+        {
+            //TempData = sayfalar arası veri taşımak için kullanıyoruz.
+            string token = TempData["token"].ToString();
+            string userId = TempData["userId"].ToString();
+
+            AppUser user = await userManager.FindByIdAsync(userId);
+
+            if(user!=null)
+            {
+                // şifrem sıfırlanacak
+                IdentityResult result = await userManager.ResetPasswordAsync(user, token, passwordResetViewModel.PasswordNew);
+
+                // başarılıysa 0 lanmış demektir.
+                // SecurityStampi Update edecez
+                // SecurityStamp = kullanıcının bilgileriye alakalı bir o anki anlık durumu tutan bir stampti
+                // önemli bir bilgiyi değiştirdiğimiz zaman veritabanında SecurityStampi de değiştiriyoruz
+                // mesela telefon numarası değişiyorsa gerek yok, özellikle username,password gibi alanlarda değiştir.
+
+                if (result.Succeeded)
+                {
+                    // bunu yapmazsak eski şifreyle dolaşmaya devam eder.
+                    await userManager.UpdateSecurityStampAsync(user);
+
+                  
+
+
+                    ViewBag.status = "success";
+                }
+                else
+                {
+                    foreach (var item in result.Errors)
+                    {
+                        ModelState.AddModelError("", item.Description);
+                    }
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Hata meydana gelmiştir. Lütfen daha sonra tekrar deneyiniz.");
+            }
+
+            return View(passwordResetViewModel);
         }
 
 
