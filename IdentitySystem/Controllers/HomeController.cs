@@ -45,7 +45,7 @@ namespace IdentitySystem.Controllers
                     if(await userManager.IsLockedOutAsync(user))
                     {
                         ModelState.AddModelError("", "Hesabınız bir süreliğine kilitlenmiştir. Lütfen daha sonra tekrar deneyiniz.");
-
+                        return View(userlogin);
                     }
 
                    await signInManager.SignOutAsync();
@@ -164,6 +164,50 @@ namespace IdentitySystem.Controllers
             // girdiği değerlerle birlikte tekrar göngderiyorum. hata varsa hatalarıda gönderiyorum.
             return View(userViewModel);
 
+        }
+
+        public IActionResult ResetPassword()
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        public IActionResult ResetPassword(PasswordResetViewModel passwordResetViewModel)
+        {
+            // benim veritabanımda kayıtlı kullanıcı var mı onu tespit edelim önce
+            AppUser user = userManager.FindByEmailAsync(passwordResetViewModel.Email).Result;
+
+            if(user != null)
+            {
+                // userManager.GeneratePasswordResetTokenAsync(user) bunu yaptığımız zaman
+                // user bilgilerinden oluşan bir tane token oluşuyor.
+
+                string passwordResetToken = userManager.GeneratePasswordResetTokenAsync(user).Result;
+
+                string passwordResetLink = Url.Action("ResetPasswordConfirm","Home",new { 
+                
+                    userId = user.Id,
+                    token = passwordResetToken
+                
+                },HttpContext.Request.Scheme);
+
+
+                // www.bıdıbıdı.com/Home/ResetPasswordConfirm?userId = asdfd&token = adgsg
+
+                Helper.PasswordReset.PasswordResetSendEmail(passwordResetLink);
+
+                ViewBag.status = "successfull";
+
+            }
+            else
+            {
+                ModelState.AddModelError("", "Sistemde kayıtlı email adresi bulunamamıştır.");
+
+            }
+
+
+            return View();
         }
 
 
