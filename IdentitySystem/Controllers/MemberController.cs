@@ -8,17 +8,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mapster;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using IdentitySystem.Enums;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+
 namespace IdentitySystem.Controllers
 {
     [Authorize]// membercontrollere sadece üyeler erişecek.
-    public class MemberController : Controller
+    public class MemberController : BaseController
     {
-        public UserManager<AppUser> userManager { get; }
-        public SignInManager<AppUser> signInManager { get; }
-        public MemberController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+       
+        public MemberController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager):base(userManager,signInManager)
         {
-            this.userManager = userManager;
-            this.signInManager = signInManager;
+          
         }
 
 
@@ -30,7 +33,7 @@ namespace IdentitySystem.Controllers
             //User.Identity.
 
 
-            AppUser user = userManager.FindByNameAsync(User.Identity.Name).Result;
+            AppUser user = CurrentUser;
             // userin içindeki propertylerden UserViewModel içerisindeki Propertyler ile eşleşenleri
             // userViewModel'e aktaracak
             UserViewModel userViewModel = user.Adapt<UserViewModel>();
@@ -45,27 +48,55 @@ namespace IdentitySystem.Controllers
         public IActionResult UserEdit()
         {
             // UserViewModel, AppUser'in kullanıcıya yansıyan tarafıydı
-            AppUser user = userManager.FindByNameAsync(User.Identity.Name).Result;
+            AppUser user = CurrentUser;
+
+
 
             UserViewModel userViewModel = user.Adapt<UserViewModel>();
+
+            ViewBag.Gender = new SelectList(Enum.GetNames(typeof(Gender)));
 
             return View(userViewModel);// kullanıcı bilgileri güncellicek bu yüzden UserViewModel'i dolu olarak gönderiyorum.
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> UserEdit(UserViewModel userViewModel)
+        public async Task<IActionResult> UserEdit(UserViewModel userViewModel,IFormFile userPicture)
         {
             ModelState.Remove("Password");
-
-            if(ModelState.IsValid)
+            ViewBag.Gender = new SelectList(Enum.GetNames(typeof(Gender)));
+            if (ModelState.IsValid)
             {
-                AppUser user = await userManager.FindByNameAsync(User.Identity.Name);
+                AppUser user = CurrentUser;
+
+                if(userPicture!=null && userPicture.Length>0)
+                {
+                    //GetExtension, userPicture'in uzantısını alır jpg,png gibi
+                    //Guid.NewGuid().ToString() yaparak isim oluşturuyoruz rastgele
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(userPicture.FileName);
+
+                    // wwwroot'un yolunu alıyorum.
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/UserPicture", fileName);
+
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await userPicture.CopyToAsync(stream);
+
+                        // statik dosyaların hepsi wwwroot içinde olması gerekiyor.
+                        user.Picture = "/UserPicture/" + fileName;
+                    }
+
+                }
+
+
 
                 // güncelliyoruz.
                 user.UserName = userViewModel.UserName;
                 user.Email = userViewModel.Email;
                 user.PhoneNumber = userViewModel.PhoneNumber;
+                user.City = userViewModel.City;
+                user.BirthDay = userViewModel.BirthDay;
+                user.Gender = (int)userViewModel.Gender;
 
                 // startuptaki hatalar geçerli. burdaki hataları Update yaparken bir hata ile karşılaşırsa
                 // bunu IdentityResult  resulta atacak
@@ -87,10 +118,7 @@ namespace IdentitySystem.Controllers
                 }
                 else
                 {
-                    foreach (var item in result.Errors)
-                    {
-                        ModelState.AddModelError("", item.Description);
-                    }
+                    AddModelError(result);
                 }
 
 
@@ -116,7 +144,7 @@ namespace IdentitySystem.Controllers
             if (ModelState.IsValid)
             {
                 // burdaki name değeri Cookie bilgisinden okuyor.
-                AppUser user = userManager.FindByNameAsync(User.Identity.Name).Result;
+                AppUser user = CurrentUser;
 
 
                 // eski şifresi doğru mu ilk bunu kontrol edelim.
@@ -150,10 +178,7 @@ namespace IdentitySystem.Controllers
                     }
                     else
                     {
-                        foreach (var item in result.Errors)
-                        {
-                            ModelState.AddModelError("", item.Description);
-                        }
+                        AddModelError(result);
                     }
 
                 }

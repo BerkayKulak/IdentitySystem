@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace IdentitySystem.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
-        public UserManager<AppUser> userManager { get; }
-        public SignInManager<AppUser> signInManager { get; }
-        public HomeController(UserManager<AppUser> userManager,SignInManager<AppUser> signInManager)
+      
+
+        
+        public HomeController(UserManager<AppUser> userManager,SignInManager<AppUser> signInManager):base(userManager, signInManager)
         {
-            this.userManager = userManager;
-            this.signInManager = signInManager;
+           
         }
         public IActionResult Index()
         {
@@ -157,10 +157,7 @@ namespace IdentitySystem.Controllers
                 // başarılı olmadıysa
                 else
                 {
-                    foreach (IdentityError item in result.Errors)
-                    {
-                        ModelState.AddModelError("", item.Description);
-                    }
+                    AddModelError(result);
                 }
             }
 
@@ -259,10 +256,7 @@ namespace IdentitySystem.Controllers
                 }
                 else
                 {
-                    foreach (var item in result.Errors)
-                    {
-                        ModelState.AddModelError("", item.Description);
-                    }
+                    AddModelError(result);
                 }
             }
             else
