@@ -11,7 +11,7 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="#">Navbar</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,15 +22,10 @@
 
 
                 <ul class="navbar-nav">
-
+                    
                     <li class="nav-item">
 
-                        <a class="nav-link" asp-action="Index" asp-controller="Member">Üye Ana Sayfa</a>
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a class="btn btn-info" asp-action="Index" asp-controller="Admin">Admin Ana Sayfa</a>
+                        <a class="nav-link" asp-action="Index" asp-controller="Admin">Admin Ana Sayfa</a>
                     </li>
 
 
@@ -52,9 +47,9 @@
 
             <div class="col-md-4">
                 <h3>Menü</h3>
-                <a class="btn btn-info btn-block"  asp-action="PasswordChange" asp-controller="Member">Şifre değiştirme</a>
-                <a class="btn btn-info btn-block" asp-action="UserEdit" asp-controller="Member">Bilgi Güncelleme</a>
-                <a class="btn btn-info btn-block" asp-action="LogOut" asp-controller="Member" asp-route-returnUrl ="/Home/Index">Çıkış Yap</a>
+                <a class="btn btn-danger btn-block"  asp-action="Users" asp-controller="Admin">Üyeler</a>
+                <a class="btn btn-danger btn-block" asp-action="Roles" asp-controller="Admin">Roller</a>
+                <a class="btn btn-danger btn-block" asp-action="LogOut" asp-controller="Member" asp-route-returnUrl ="/Home/Index">Çıkış Yap</a>
             </div>
 
         </div>

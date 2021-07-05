@@ -202,7 +202,10 @@ namespace IdentitySystem.Controllers
       
         }
 
-
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
 
 
     }

@@ -77,7 +77,7 @@ namespace IdentitySystem
 
             services.ConfigureApplicationCookie(opts =>
             {
-                opts.ExpireTimeSpan = TimeSpan.FromDays(60);
+               
                 // kullanýcý üye olmadan, üyelerin eriþebildiði bir sayfaya týklarsa kullanýcýyý login sayfasýna yönlendiririz.
                 opts.LoginPath = new PathString("/Home/Login");
                 opts.LogoutPath = new PathString("/Member/LogOut");
@@ -87,6 +87,12 @@ namespace IdentitySystem
                 // kullanýcýyýa 60 gün vermiþtik ya hani, eðer siz SlidingExpiration süresini true yaparsanýz.
                 // 60'ýn yarýsýný geçtikten sonra eðer siteye istek yaparsa tekrar bi 60 gün daha eklicek.
                 opts.SlidingExpiration = true;
+
+                opts.ExpireTimeSpan = TimeSpan.FromDays(60);
+
+                // eðer kullanýcý üye olduktan sonra, admin linkine týklarsa, editor rolüne sahip ama yönetici rolüne týklarsa 
+                // bu sayfaya eriþemediðiyle ilgili bir bilgi verilir. Eriþime yetkisi olmayan üye kullanýcýlarýn gideceði path olacak
+                opts.AccessDeniedPath = new PathString("/Member/AccessDenied");
 
             });
 

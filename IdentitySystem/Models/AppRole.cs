@@ -10,5 +10,6 @@ namespace IdentitySystem.Models
     {
         //public string RoleType { get; set; }
 
+
     }
 }
