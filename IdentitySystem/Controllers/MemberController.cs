@@ -208,5 +208,22 @@ namespace IdentitySystem.Controllers
         }
 
 
+        [Authorize(Roles = "manager,Admin")]
+        public IActionResult Manager()
+        {
+            // burdaki actiona artık sadece manager rolüne sahip olanlar girecek.
+            return View();
+        }
+
+
+        [Authorize(Roles = "editor,Admin")]
+        public IActionResult Editor()
+        {
+            // burdaki actiona artık sadece editor rolüne sahip olanlar girecek.
+            return View();
+        }
+
+
+
     }
 }
