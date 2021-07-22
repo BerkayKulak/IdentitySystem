@@ -220,7 +220,7 @@ namespace IdentitySystem.Controllers
         public IActionResult Editor()
         {
             // burdaki actiona artık sadece editor rolüne sahip olanlar girecek.
-            return View();
+            return View();//456
         }
 
 
