@@ -187,6 +187,7 @@ namespace IdentitySystem.Controllers
                 {
                     // checkbox işaretli değilse rolü kaldır.
                   await  userManager.RemoveFromRoleAsync(user, item.RoleName);
+
                 }
             }
 
