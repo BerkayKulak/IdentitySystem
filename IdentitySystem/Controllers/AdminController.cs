@@ -202,5 +202,39 @@ namespace IdentitySystem.Controllers
 
             return RedirectToAction("Users");
         }
+
+
+        public async Task<IActionResult> ResetUserPassword(string id)
+        {
+            AppUser user = await userManager.FindByIdAsync(id);
+
+            PasswordResetByAdminViewModel passwordResetByAdminViewModel = new PasswordResetByAdminViewModel();
+
+            passwordResetByAdminViewModel.UserId = user.Id;
+
+            return View(passwordResetByAdminViewModel);
+
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetUserPassword(PasswordResetByAdminViewModel passwordResetByAdminViewModel)
+        {
+            AppUser user = await userManager.FindByIdAsync(passwordResetByAdminViewModel.UserId);
+
+            string token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+            await userManager.ResetPasswordAsync(user, token, passwordResetByAdminViewModel.NewPassword);
+
+            await userManager.UpdateSecurityStampAsync(user);
+
+            //securitystamp degerini update etmezsem kullanıcı eski şifresiyle sitemizde dolaşmaya devam eder
+            // ne zaman çıkış yaparsa, o zaman tekrar yeni şifre ile girmek zorunda
+            // eğer update edersem kullanıcı otomatik olarak sitemize girdiği zaman login ekranına yönlendirecek
+
+            return RedirectToAction("Users"); 
+
+        }
+
     }
 }

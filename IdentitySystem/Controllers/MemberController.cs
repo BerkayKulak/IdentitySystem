@@ -68,9 +68,23 @@ namespace IdentitySystem.Controllers
             ViewBag.Gender = new SelectList(Enum.GetNames(typeof(Gender)));
             if (ModelState.IsValid)
             {
+               
+
+
                 AppUser user = CurrentUser;
 
-                if(userPicture!=null && userPicture.Length>0)
+                string phone = userManager.GetPhoneNumberAsync(user).Result;
+
+                if (phone != userViewModel.PhoneNumber)
+                {
+                    if(userManager.Users.Any(u=>u.PhoneNumber == userViewModel.PhoneNumber))
+                    {
+                        ModelState.AddModelError("", "Bu telefon numarası başka üye tarafından kullanılmaktadır.");
+                        return View(userViewModel);
+                    }
+                }
+
+                    if (userPicture!=null && userPicture.Length>0)
                 {
                     //GetExtension, userPicture'in uzantısını alır jpg,png gibi
                     //Guid.NewGuid().ToString() yaparak isim oluşturuyoruz rastgele

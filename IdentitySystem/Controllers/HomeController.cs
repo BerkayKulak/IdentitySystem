@@ -136,6 +136,14 @@ namespace IdentitySystem.Controllers
 
             if(ModelState.IsValid)
             {
+                if(userManager.Users.Any(u=>u.PhoneNumber == userViewModel.PhoneNumber))
+                {
+                    ModelState.AddModelError("", "Bu telefon numarası kayıtlıdır.");
+
+                    return View(userViewModel);
+                }
+
+
                 AppUser user = new AppUser();
                 user.UserName = userViewModel.UserName;
                 user.Email = userViewModel.Email;
@@ -285,6 +293,26 @@ namespace IdentitySystem.Controllers
             }
 
             return View(passwordResetViewModel);
+        }
+
+        public async Task<IActionResult> ConfirmEmail(string userId,string token)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+
+            IdentityResult result = await userManager.ConfirmEmailAsync(user, token);
+
+            if(result.Succeeded)
+            {
+                ViewBag.status = "Email adressiniz onaylanmıştır. Login ekranından giriş yapabilirsiniz.";
+            }
+            else
+            {
+                ViewBag.status = "Bir hata meydana geldi. Lütfen daha sonra tekrar deneyiniz.";
+            }
+
+
+            return View();
+
         }
 
 
