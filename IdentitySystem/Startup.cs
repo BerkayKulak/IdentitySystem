@@ -1,6 +1,7 @@
 using IdentitySystem.CustomValidation;
 using IdentitySystem.Models;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -31,6 +32,7 @@ namespace IdentitySystem
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<IAuthorizationHandler, ExpireDateExchangeHandler>();
             // istemiþ olduðu sýnýfýn bir nesne örneðini oluþturur.
             services.AddDbContext<AppIdentityDbContext>(opts =>
             {
@@ -52,9 +54,17 @@ namespace IdentitySystem
                     policy.RequireClaim("city", "ankara");
                 });
 
+
+
                 opts.AddPolicy("ViolencePolicy", policy =>
                 {
                     policy.RequireClaim("violence");
+                });
+
+
+                opts.AddPolicy("ExchangePolicy", policy =>
+                {
+                    policy.AddRequirements(new ExpireDateExchangeRequirement());
                 });
             });
 

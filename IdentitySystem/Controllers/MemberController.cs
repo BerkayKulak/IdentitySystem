@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using IdentitySystem.Enums;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using System.Security.Claims;
 
 namespace IdentitySystem.Controllers
 {
@@ -205,13 +206,17 @@ namespace IdentitySystem.Controllers
         public IActionResult AccessDenied(string returnUrl)
         {
 
-            if (returnUrl.Contains("ViolencePage"))
+            if (returnUrl.ToLower().Contains("violencepage"))
             {
                 ViewBag.message = "Erişmeye çalıştığınız sayfa şiddet videoları içerdiğinden dolayı 15 yaşından büyük olmanız gerekmektedir.";
             }
-            else if (returnUrl.Contains("AnkaraPage"))
+            else if (returnUrl.ToLower().Contains("ankarapage"))
             {
                 ViewBag.message = "Bu sayfaya sadece şehir alanı ankara olan kullanıcılar erişebilir.";
+            }
+            else if (returnUrl.ToLower().Contains("exchange"))
+            {
+                ViewBag.message = "30 günlük ücretsiz deneme hakkınız sona ermiştir.";
             }
             else
             {
@@ -249,6 +254,26 @@ namespace IdentitySystem.Controllers
             return View();
         }
 
+        public async Task<IActionResult> ExchangeRedirect()
+        {
+            bool result = User.HasClaim(x => x.Type == "ExpireDateExchange");
+
+            if(!result)
+            {
+                Claim ExpireDateExchange = new Claim("ExpireDateExchange", DateTime.Now.AddDays(30).Date.ToShortDateString(), ClaimValueTypes.String, "Internal");
+                await userManager.AddClaimAsync(CurrentUser, ExpireDateExchange);
+                await signInManager.SignOutAsync();
+                await signInManager.SignInAsync(CurrentUser, true);
+            }
+
+            return RedirectToAction("ExChange");
+        }
+
+        [Authorize(Policy = "ExchangePolicy")]
+        public IActionResult Exchange()
+        {
+            return View();
+        }
 
 
 
