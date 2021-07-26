@@ -1,5 +1,6 @@
 using IdentitySystem.CustomValidation;
 using IdentitySystem.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -37,7 +38,20 @@ namespace IdentitySystem
 
             });
 
-          
+
+            //claim bazlý yetkilendirme yapmak için bir tane policy eklememiz lazým.
+            // bunuda AddAuthorization servisi içerisinde ekliyorum.
+            // policy adým = AnkaraPolicy, sözleþme gibi düþün
+            //bunu belirtmiþ olduðum yerde kullanýcýnýn mutlaka city claimine sahip olmasý lazým
+            // ayný zamanda deðeride ankara olmasý lazým.
+
+            services.AddAuthorization(opts =>
+            {
+                opts.AddPolicy("AnkaraPolicy", policy =>
+                {
+                    policy.RequireClaim("city", "ankara");
+                });
+            });
 
 
             //IdentityUseri' App user olarak miras aldýk.
@@ -95,6 +109,8 @@ namespace IdentitySystem
                 opts.AccessDeniedPath = new PathString("/Member/AccessDenied");
 
             });
+
+            services.AddScoped<IClaimsTransformation, ClaimProvider.ClaimProvider>();
 
             services.AddMvc(options => options.EnableEndpointRouting = false);
             

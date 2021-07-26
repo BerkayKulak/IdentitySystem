@@ -28,6 +28,13 @@ namespace IdentitySystem.Controllers
             return View();
         }
 
+        public IActionResult Claims()
+        {
+            return View(User.Claims.ToList());
+        }
+
+    
+
         public IActionResult RoleCreate()
         {
             return View();
@@ -190,6 +197,8 @@ namespace IdentitySystem.Controllers
 
                 }
             }
+
+
 
             return RedirectToAction("Users");
         }

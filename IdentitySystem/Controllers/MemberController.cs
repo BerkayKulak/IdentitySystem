@@ -223,6 +223,12 @@ namespace IdentitySystem.Controllers
             return View();//456
         }
 
+        [Authorize(Policy ="AnkaraPolicy")]
+        public IActionResult AnkaraPage()
+        {
+            return View();
+        }
+
 
 
     }
