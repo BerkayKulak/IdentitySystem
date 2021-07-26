@@ -202,8 +202,22 @@ namespace IdentitySystem.Controllers
       
         }
 
-        public IActionResult AccessDenied()
+        public IActionResult AccessDenied(string returnUrl)
         {
+
+            if (returnUrl.Contains("ViolencePage"))
+            {
+                ViewBag.message = "Erişmeye çalıştığınız sayfa şiddet videoları içerdiğinden dolayı 15 yaşından büyük olmanız gerekmektedir.";
+            }
+            else if (returnUrl.Contains("AnkaraPage"))
+            {
+                ViewBag.message = "Bu sayfaya sadece şehir alanı ankara olan kullanıcılar erişebilir.";
+            }
+            else
+            {
+                ViewBag.message = "Bu sayfaya erişim izniniz yoktur. erişim izni için yöneticiyle görüşünüz.";
+            }
+
             return View();
         }
 
@@ -228,6 +242,14 @@ namespace IdentitySystem.Controllers
         {
             return View();
         }
+
+        [Authorize(Policy = "ViolencePolicy")]
+        public IActionResult ViolencePage()
+        {
+            return View();
+        }
+
+
 
 
 

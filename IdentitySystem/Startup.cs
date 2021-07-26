@@ -51,6 +51,11 @@ namespace IdentitySystem
                 {
                     policy.RequireClaim("city", "ankara");
                 });
+
+                opts.AddPolicy("ViolencePolicy", policy =>
+                {
+                    policy.RequireClaim("violence");
+                });
             });
 
 
