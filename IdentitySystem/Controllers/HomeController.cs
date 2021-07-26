@@ -53,6 +53,13 @@ namespace IdentitySystem.Controllers
                         return View(userlogin);
                     }
 
+                    if(userManager.IsEmailConfirmedAsync(user).Result == false)
+                    {
+                        ModelState.AddModelError("", "Email adresiniz doğrulanmamıştır. Lütfen epostanızı kontrol ediniz.");
+                        return View(userlogin);
+                    }
+
+
                    await signInManager.SignOutAsync();
 
                     //userlogin.RememberMe = cookienin gerçekten geçerli olup olmadığını kontrol edicez. checkboxtan kontrol edicez. işaretlersem true olur.
@@ -147,6 +154,19 @@ namespace IdentitySystem.Controllers
                 // 2.senaryo bazı web siteleri kullanıı üye olduktan sonra kullanıcıyı login ekranına yönlendiriyor.
                 if (result.Succeeded)
                 {
+                    string confirmationToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                    string link = Url.Action("ConfirmEmail", "Home", new
+                    {
+                        userId = user.Id,
+                        token = confirmationToken
+
+
+                    },protocol:HttpContext.Request.Scheme);
+
+                    Helper.EmailConfirmation.SendEmail(link, user.Email);
+
+                        
+
                     // eğer kullanıcı gerçekten başarılı bir şekilde kayıt olmuşsa 
                     // giriş ekranına yönlendiririm. biz kayıt olduktan sonra giriş ekranına yönlendireceğiz
                     // 2.senaryo
@@ -197,7 +217,7 @@ namespace IdentitySystem.Controllers
 
                 // www.bıdıbıdı.com/Home/ResetPasswordConfirm?userId = asdfd&token = adgsg
 
-                Helper.PasswordReset.PasswordResetSendEmail(passwordResetLink);
+                Helper.PasswordReset.PasswordResetSendEmail(passwordResetLink,user.Email);
 
                 ViewBag.status = "success";
 

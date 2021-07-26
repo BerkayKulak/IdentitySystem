@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Net.Mail;
+using System.Threading.Tasks;
+
 namespace IdentitySystem.Helper
 {
-    public static class PasswordReset
+    public static class EmailConfirmation
     {
-        public static void PasswordResetSendEmail(string link,string email)
+
+        public static void SendEmail(string link, string email)
         {
             MailMessage mail = new MailMessage();
 
@@ -19,9 +21,9 @@ namespace IdentitySystem.Helper
 
             // kime gidicek email burada belirtiyoruz
             mail.To.Add(email);
-            mail.Subject = $"www.bıdıbıdı.com::Şifre Sıfırlama";
-            mail.Body = "<h2>Şifrenizi yenilemek için lütfen aşağıdaki linke tıklayınız.</h2><hr/>";
-            mail.Body += $"<a href = '{link}'> şifre yenileme linki </a>";
+            mail.Subject = $"www.bıdıbıdı.com::Email doğrulama";
+            mail.Body = "<h2>Email adresinizi doğrulamak için lütfen aşağıdaki linke tıklayınız.</h2><hr/>";
+            mail.Body += $"<a href = '{link}'> email doğrulama linki </a>";
             mail.IsBodyHtml = true;
             smtpClient.Port = 587;
             smtpClient.EnableSsl = true;
@@ -29,5 +31,7 @@ namespace IdentitySystem.Helper
             smtpClient.Send(mail);
 
         }
+
+
     }
 }
